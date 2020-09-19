@@ -1,11 +1,33 @@
+import { useEffect } from "react";
 import fs from "fs";
 import path from "path";
+import matter from "gray-matter";
+import marked from "marked";
+import hljs from "highlight.js";
+// import "highlight.js/styles/github.css";
 
-export default ({ md }) => {
-  return <div>{md}</div>;
+export default ({ md, data, input, content }) => {
+  useEffect(() => {
+    hljs.initHighlighting.called = false;
+    hljs.initHighlighting();
+  }, []);
+
+  return (
+    <div>
+      <div dangerouslySetInnerHTML={{ __html: input }} />
+      <div>{data.input}</div>
+      <div dangerouslySetInnerHTML={{ __html: content }} />
+    </div>
+  );
 };
 
 export const getStaticProps = async (ctx) => {
+  marked.setOptions({
+    highlight: function (code, lang) {
+      return hljs.highlight(lang, code).value;
+    },
+  });
+
   const dirs = fs
     .readdirSync("algorithms")
     .filter((dir) => !dir.includes(".md"));
@@ -30,10 +52,16 @@ export const getStaticProps = async (ctx) => {
   const filename = files[idx];
 
   const md = fs.readFileSync(filename).toString();
-
+  const mdMatter = matter(md);
+  console.log(mdMatter.data.input);
+  const input = marked(mdMatter.data.input);
+  const content = marked(mdMatter.content);
   return {
     props: {
       md,
+      data: mdMatter.data,
+      input,
+      content,
     },
   };
 
