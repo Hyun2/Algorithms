@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
 
-export default function Home() {
-  return <div></div>;
-}
+export default ({ md }) => {
+  return <div>{md}</div>;
+};
 
 export const getStaticProps = async (ctx) => {
   const dirs = fs
@@ -19,12 +19,23 @@ export const getStaticProps = async (ctx) => {
       .filter((file) => file.includes(".md") && !file.includes("기본개념.md"));
 
     if (result) {
-      files.push(...result);
+      for (const file of result) {
+        files.push(path.join("algorithms", dir, file));
+      }
     }
   }
   console.log(files);
+  const idx = Math.floor(Math.random() * files.length);
+  console.log(files[idx]);
+  const filename = files[idx];
 
-  return { props: {} };
+  const md = fs.readFileSync(filename).toString();
+
+  return {
+    props: {
+      md,
+    },
+  };
 
   // const markdownWithMetadata = fs
   //   .readFileSync(path.join("posts", slug + ".md"))
