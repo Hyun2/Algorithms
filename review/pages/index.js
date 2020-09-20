@@ -4,9 +4,11 @@ import path from "path";
 import matter from "gray-matter";
 import marked from "marked";
 import hljs from "highlight.js";
+import { Button } from "antd";
+
 // import "highlight.js/styles/github.css";
 
-export default ({ md, data, input, content }) => {
+export default ({ original, problem, input, output, hint }) => {
   useEffect(() => {
     hljs.initHighlighting.called = false;
     hljs.initHighlighting();
@@ -14,9 +16,12 @@ export default ({ md, data, input, content }) => {
 
   return (
     <div>
+      <div dangerouslySetInnerHTML={{ __html: problem }} />
       <div dangerouslySetInnerHTML={{ __html: input }} />
-      <div>{data.input}</div>
-      <div dangerouslySetInnerHTML={{ __html: content }} />
+      <div dangerouslySetInnerHTML={{ __html: output }} />
+      <div dangerouslySetInnerHTML={{ __html: hint }} />
+      <Button type="primary">버튼</Button>
+      <div>original</div>
     </div>
   );
 };
@@ -51,17 +56,21 @@ export const getStaticProps = async (ctx) => {
   console.log(files[idx]);
   const filename = files[idx];
 
-  const md = fs.readFileSync(filename).toString();
-  const mdMatter = matter(md);
-  console.log(mdMatter.data.input);
-  const input = marked(mdMatter.data.input);
-  const content = marked(mdMatter.content);
+  const original = fs.readFileSync(filename).toString();
+  const mdMatter = matter(original);
+  const content = mdMatter.content.split("---");
+  console.log(content);
+  console.log(content.length);
+  // console.log(mdMatter.data.input);
+  // const input = marked(mdMatter.data.input);
+  // const content = marked(mdMatter.content);
   return {
     props: {
-      md,
-      data: mdMatter.data,
-      input,
-      content,
+      original,
+      problem: marked(content[0]),
+      input: marked(content[1]),
+      output: marked(content[2]),
+      hint: marked(content[3]),
     },
   };
 

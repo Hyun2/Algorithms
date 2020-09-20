@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Hyun2/Algorithms/issues"
   },
-  "homepage": "https://github.com/Hyun2/Algorithms#readme"
+  "homepage": "https://github.com/Hyun2/Algorithms#readme",
+  "dependencies": {
+    "antd": "^4.6.4"
+  }
 }
